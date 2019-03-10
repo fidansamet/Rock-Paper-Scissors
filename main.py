@@ -83,50 +83,55 @@ class MyServer(BaseHTTPRequestHandler):
                 choose = idOrChoose[1]
                 id = playCommands[1].split("=")[1]
 
-            if id in games:         # if there is a game has that id, user can play it
-                gameInfo = games[id]
-                totalRound = gameInfo[0]
-                gameInfo[1] += 1        # increase round number
-                curRound = gameInfo[1]
-                me = choices[random.randint(0, 2)]
-                status = RPS(me.capitalize(), choose.capitalize())
+            if choose.capitalize() in choices:
 
-                self.wfile.write(bytes("\n-> ROUND %s\n" % curRound, "utf-8"))
-                self.wfile.write(bytes("\nme: %s\n" % me.upper(), "utf-8"))
-                self.wfile.write(bytes("you: %s\n\n" % choose.upper(), "utf-8"))
+                if id in games:         # if there is a game has that id, user can play it
+                    gameInfo = games[id]
+                    totalRound = gameInfo[0]
+                    gameInfo[1] += 1        # increase round number
+                    curRound = gameInfo[1]
+                    me = choices[random.randint(0, 2)]
+                    status = RPS(me.capitalize(), choose.capitalize())
 
-                if status == 0:     # status lose
-                    self.wfile.write(bytes("YOU LOST THIS ROUND!!\n", "utf-8"))
-                    gameInfo[4] += 1
-                elif status == 1:   # status win
-                    self.wfile.write(bytes("YOU WON THIS ROUND!!\n", "utf-8"))
-                    gameInfo[3] += 1
-                else:       # status tie
-                    self.wfile.write(bytes("TIE!!\n", "utf-8"))
+                    self.wfile.write(bytes("\n-> ROUND %s\n" % curRound, "utf-8"))
+                    self.wfile.write(bytes("\nme: %s\n" % me.upper(), "utf-8"))
+                    self.wfile.write(bytes("you: %s\n\n" % choose.upper(), "utf-8"))
 
-                gameInfo[2].append([me.capitalize(), choose.capitalize()])
-                rounds = gameInfo[2]
+                    if status == 0:     # status lose
+                        self.wfile.write(bytes("YOU LOST THIS ROUND!!\n", "utf-8"))
+                        gameInfo[4] += 1
+                    elif status == 1:   # status win
+                        self.wfile.write(bytes("YOU WON THIS ROUND!!\n", "utf-8"))
+                        gameInfo[3] += 1
+                    else:       # status tie
+                        self.wfile.write(bytes("TIE!!\n", "utf-8"))
 
-                if curRound >= totalRound:      # user played all rounds
-                    self.wfile.write(bytes("\n-> GAME COMPLETED", "utf-8"))
-                    for i in range(totalRound):
-                        self.wfile.write(bytes("\nRound %s: " % str(i+1), "utf-8"))
-                        self.wfile.write(bytes("%s vs %s" % (rounds[i][0], rounds[i][1]), "utf-8"))
+                    gameInfo[2].append([me.capitalize(), choose.capitalize()])
+                    rounds = gameInfo[2]
 
-                    self.wfile.write(bytes("\n\n%s vs %s\n" % (gameInfo[4], gameInfo[3]), "utf-8"))
-                    if gameInfo[3] > gameInfo[4]:
-                        self.wfile.write(bytes("YOU WON !!\n\n", "utf-8"))
-                    elif gameInfo[4] > gameInfo[3]:
-                        self.wfile.write(bytes("YOU LOST !!\n\n", "utf-8"))
+                    if curRound >= totalRound:      # user played all rounds
+                        self.wfile.write(bytes("\n-> GAME COMPLETED", "utf-8"))
+                        for i in range(totalRound):
+                            self.wfile.write(bytes("\nRound %s: " % str(i+1), "utf-8"))
+                            self.wfile.write(bytes("%s vs %s" % (rounds[i][0], rounds[i][1]), "utf-8"))
+
+                        self.wfile.write(bytes("\n\n%s vs %s\n" % (gameInfo[4], gameInfo[3]), "utf-8"))
+                        if gameInfo[3] > gameInfo[4]:
+                            self.wfile.write(bytes("YOU WON !!\n\n", "utf-8"))
+                        elif gameInfo[4] > gameInfo[3]:
+                            self.wfile.write(bytes("YOU LOST !!\n\n", "utf-8"))
+                        else:
+                            self.wfile.write(bytes("TIE !!\n\n", "utf-8"))
+                        games.pop(id)       # if game is completed then delete it
+
                     else:
-                        self.wfile.write(bytes("TIE !!\n\n", "utf-8"))
-                    games.pop(id)       # if game is completed then delete it
+                        self.wfile.write(bytes("\nThere is %s more round.\n\n" % str(totalRound-curRound), "utf-8"))
 
-                else:
-                    self.wfile.write(bytes("\nThere is %s more round.\n\n" % str(totalRound-curRound), "utf-8"))
+                else:       # if there is no game has that id give an error
+                    self.wfile.write(bytes("\nFirst you need to create a new game.\n\n", "utf-8"))
 
-            else:       # if there is no game has that id give an error
-                self.wfile.write(bytes("\nFirst you need to create a new game.\n\n", "utf-8"))
+            else:           # if user's choice is invalid give an error
+                self.wfile.write(bytes("\nInvalid choice.\n\n", "utf-8"))
 
 
 if __name__ == "__main__":
