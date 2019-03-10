@@ -4,7 +4,6 @@ import random
 hostName = "localhost"
 serverPort = 8080
 randomRange = 1000
-
 games = {}
 choices = ["Rock", "Paper", "Scissors"]
 
@@ -30,7 +29,7 @@ def RPS(me, you):
 
 
 def findUniqueId(games):        # no two games can have the same id, so we need to find a unique id
-    if randomRange == len(games):
+    if randomRange == len(games):   # user reached the max number of unfinished games, make a request to play them
         return None
     sessionId = str(random.randint(0, randomRange))
     if sessionId in games:      # if random id is in use then try another random id
